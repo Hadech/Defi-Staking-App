@@ -3,13 +3,12 @@ import "./App.css";
 import Navbar from "./Navbar";
 import Web3 from "web3";
 //import Main from './Main'
-import Tether from '../truffle_abis/Tether.json'
-//import RWD from '../truffle_abis/RWD.json'
-//import DecentralBank from '../truffle_abis/DecentralBank.json'
+import Tether from "../truffle_abis/Tether.json";
+import RWD from "../truffle_abis/RWD.json";
+import DecentralBank from "../truffle_abis/DecentralBank.json";
 //import ParticleSettings from './ParticleSettings'
 
 class App extends Component {
-  
   async componentWillMount() {
     await this.loadWeb3();
     await this.loadBlockchainData();
@@ -62,8 +61,8 @@ class App extends Component {
       }
     } catch (error) {
       // Manejo básico de errores (p. ej. usuario rechazó la solicitud de conexión)
-      console.error('Error connecting to web3 provider:', error);
-      window.alert('No se pudo conectar al wallet. Comprueba los permisos.');
+      console.error("Error connecting to web3 provider:", error);
+      window.alert("No se pudo conectar al wallet. Comprueba los permisos.");
     }
   }
 
@@ -76,11 +75,13 @@ class App extends Component {
     try {
       const web3 = window.web3;
       const accounts = await web3.eth.getAccounts();
-      console.log('accounts:', accounts);
+      console.log("accounts:", accounts);
 
       // Validar que hay al menos una cuenta conectada
       if (!accounts || accounts.length === 0) {
-        window.alert('No se detectaron cuentas. Conecta tu wallet y acepta los permisos.');
+        window.alert(
+          "No se detectaron cuentas. Conecta tu wallet y acepta los permisos."
+        );
         return;
       }
 
@@ -89,31 +90,64 @@ class App extends Component {
       this.setState({ account });
 
       const networkId = await web3.eth.net.getId();
-      console.log('Network ID:', networkId);
+      console.log("Network ID:", networkId);
 
       // LOAD Tether TOKEN
       const tetherData = Tether.networks[networkId];
-      console.log('TetherData', tetherData);
+      console.log("TetherData", tetherData);
       if (tetherData) {
         const tether = new web3.eth.Contract(Tether.abi, tetherData.address);
-        console.log('Tether: ', tether);
+        console.log("Tether: ", tether);
         this.setState({ tether });
 
         // Usar la variable `account` garantizando que no sea undefined
         let tetherBalance = await tether.methods.balanceOf(account).call();
         this.setState({ tetherBalance: tetherBalance.toString() });
         console.log("Tether balance", tetherBalance);
-        
       } else {
-        window.alert('tether contract not deployed to detected network');
+        window.alert("tether contract not deployed to detected network");
+      }
+
+      // LOAD RWD TOKEN
+      const rwdTokenData = RWD.networks[networkId];
+      console.log("Reward Token", rwdTokenData);
+      if (rwdTokenData) {
+        const rwd = new web3.eth.Contract(RWD.abi, rwdTokenData.address);
+        console.log("RWD: ", rwd);
+        this.setState({ RWD });
+        let rwdTokenBalance = await rwd.methods.balanceOf(account).call();
+        console.log("RWD balance", rwdTokenBalance);
+        this.setState({ rwdTokenBalance: rwdTokenBalance.toString() });
+      } else {
+        window.alert("Reward Token contract not deployed to detected network");
+      }
+
+      // LOAD DecentralBank TOKEN
+      const decentralBankData = DecentralBank.networks[networkId];
+      console.log("DecentralBank", decentralBankData);
+      if (decentralBankData) {
+        const decentralBank = new web3.eth.Contract(
+          DecentralBank.abi,
+          decentralBankData.address
+        );
+        console.log("DecentralBank: ", decentralBank);
+        this.setState({ decentralBank });
+        let stakingBalance = await decentralBank.methods
+          .stakingBalance(account)
+          .call();
+        console.log("Staking balance", stakingBalance);
+        this.setState({ stakingBalance: stakingBalance.toString() });
+      } else {
+        window.alert("DecentralBank contract not deployed to detected network");
       }
     } catch (error) {
-      // Mensaje de ayuda para diagnóstico (ABI incorrecta, nodo no sincronizado, dirección inválida, etc.)
-      console.error('Error en loadBlockchainData:', error);
-      window.alert('Error al cargar datos de la blockchain. Revisa la consola para más detalles.');
+      console.error("Error en loadBlockchainData:", error);
+      window.alert(
+        "Error al cargar datos de la blockchain. Revisa la consola para más detalles."
+      );
     }
+    this.setState({ loading: false });
   }
-    
 
   constructor(props) {
     super(props);
@@ -122,10 +156,10 @@ class App extends Component {
       tether: {},
       rwd: {},
       decentralBank: {},
-      tetherBalance: '0',
-      rwdTokenBalance: '0',
-      stakingBalance: '0',
-      loading: true
+      tetherBalance: "0",
+      rwdTokenBalance: "0",
+      stakingBalance: "0",
+      loading: true,
     };
   }
 
