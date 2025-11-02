@@ -54,18 +54,6 @@ o instalar/usar Node 18 LTS.
 - `truffle-config.js`: compilador fijado a `0.5.17` para evitar problemas de resolución remota.
 - `package.json`: scripts ajustados para compatibilidad con OpenSSL cuando aplica.
 
-## Licencia y atribución
-
-El código original proviene del repositorio de Packt (enlace más arriba). Esta versión contiene modificaciones y mejoras realizadas por el autor de esta fork.
-
-Este repositorio se publica bajo la Licencia MIT. Consulta el archivo `LICENSE` para el texto completo.
-
-Si eres el autor original y tienes preocupaciones sobre la licencia o atribución, contacta al mantenedor de este fork.
-
-## Contacto
-
-Si necesitas que deje el repositorio en un estado distinto (por ejemplo, vacío) o que realice alguna operación git adicional, indícalo y preparo los comandos seguros.
-# Repo vacío
 ```markdown
 # Defi Staking App (forked and updated)
 
@@ -107,22 +95,6 @@ npx truffle migrate --network development --reset
 npm run start
 ```
 
-Notas:
-- Si obtienes un error relacionado con OpenSSL al ejecutar `npm start` (por ejemplo `ERR_OSSL_EVP_UNSUPPORTED`), puedes usar temporalmente:
-
-```zsh
-NODE_OPTIONS=--openssl-legacy-provider npm run start
-```
-
-o instalar/usar Node 18 LTS.
-
-## Cambios relevantes en esta fork
-
-- `src/components/Navbar.js`: Navbar responsive y colapsable; truncamiento de dirección de cuenta.
-- `src/components/App.js`: Documentación y manejo más robusto de `loadWeb3` y `loadBlockchainData` (validación de cuentas, uso de variables locales antes de llamadas a contratos).
-- `truffle-config.js`: compilador fijado a `0.5.17` para evitar problemas de resolución remota.
-- `package.json`: scripts ajustados para compatibilidad con OpenSSL cuando aplica.
-
 ## Licencia y atribución
 
 El código original proviene del repositorio de Packt (enlace más arriba). Esta versión contiene modificaciones y mejoras realizadas por el autor de esta fork.
@@ -130,9 +102,3 @@ El código original proviene del repositorio de Packt (enlace más arriba). Esta
 Este repositorio se publica bajo la Licencia MIT. Consulta el archivo `LICENSE` para el texto completo.
 
 Si eres el autor original y tienes preocupaciones sobre la licencia o atribución, contacta al mantenedor de este fork.
-
-## Contacto
-
-Si necesitas que deje el repositorio en un estado distinto (por ejemplo, vacío) o que realice alguna operación git adicional, indícalo y preparo los comandos seguros.
-
-# Repo vacío
