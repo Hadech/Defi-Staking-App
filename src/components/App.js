@@ -165,28 +165,25 @@ class App extends Component {
 
   render() {
     let content;
-    {
-      this.state.loading
-        ? (content = (
-            <p
-              id="loader"
-              className="text-center"
-              style={{ color: "white", margin: "30px" }}
-            >
-              LOADING PLEASE...
-            </p>
-          ))
-        : (content = (
-            <Main
-              tetherBalance={this.state.tetherBalance}
-              rwdBalance={this.state.rwdTokenBalance}
-              stakingBalance={this.state.stakingBalance}
-              stakeTokens={this.stakeTokens}
-              unstakeTokens={this.unstakeTokens}
-              decentralBankContract={this.decentralBank}
-            />
-          ));
-    }
+    // Assign content based on loading state without unnecessary nested block
+    content = this.state.loading ? (
+      <p
+        id="loader"
+        className="text-center"
+        style={{ color: "white", margin: "30px" }}
+      >
+        LOADING PLEASE...
+      </p>
+    ) : (
+      <Main
+        tetherBalance={this.state.tetherBalance}
+        rwdBalance={this.state.rwdTokenBalance}
+        stakingBalance={this.state.stakingBalance}
+        stakeTokens={this.stakeTokens}
+        unstakeTokens={this.unstakeTokens}
+        decentralBankContract={this.decentralBank}
+      />
+    );
     return (
       <div className="App" style={{ position: "relative" }}>
         <div style={{ position: "absolute" }}>
