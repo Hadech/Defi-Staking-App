@@ -187,6 +187,10 @@ class App extends Component {
           .on("transactionHash", (hash) => {
             this.setState({ loading: false });
           });
+      })
+      .on("error", (error) => {
+        console.error("Error during stakeTokens transaction:", error);
+        this.setState({ loading: false });
       });
   };
 
@@ -198,7 +202,6 @@ class App extends Component {
    * - Registra un listener para el evento "transactionHash" y restablece loading a false al recibir el hash.
    *
    * Nota: este método lanza una transacción asíncrona y no espera la confirmación final (receipt).
-   * Se recomienda añadir manejo de errores (evento "error") y/o procesar el "receipt" cuando sea necesario.
    *
    * @returns {void} No devuelve un valor directo; el ciclo de vida de la transacción se gestiona mediante callbacks de web3.
    */
@@ -208,6 +211,10 @@ class App extends Component {
       .unstakeTokens()
       .send({ from: this.state.account })
       .on("transactionHash", (hash) => {
+        this.setState({ loading: false });
+      })
+      .on("error", (error) => {
+        console.error("Error during unstakeTokens transaction:", error);
         this.setState({ loading: false });
       });
   };
