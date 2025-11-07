@@ -149,6 +149,69 @@ class App extends Component {
     this.setState({ loading: false });
   }
 
+  /**
+   * Aprueba que el contrato DecentralBank pueda transferir la cantidad especificada de tokens Tether
+   * en nombre del usuario, y a continuación llama al contrato DecentralBank para depositar (stake) esos tokens.
+   *
+   * Comportamiento y efectos secundarios:
+   *  - Establece this.state.loading = true inmediatamente al invocarse y la restablece a false después de
+   *    que la transacción de depósito emita su evento "transactionHash".
+   *  - Depende de que this.state.tether (instancia ERC-20), this.state.decentralBank (instancia del contrato)
+   *    y this.state.account (dirección del usuario) estén inicializados.
+   *  - Lanza dos transacciones en la cadena en secuencia:
+   *      1. tether.approve(decentralBankAddress, amount)   // transacción de aprobación
+   *      2. decentralBank.depositTokens(amount)           // transacción de depósito, disparada al recibir el hash de la aprobación
+   *  - Los errores relacionados con las transacciones (reverts, rechazo por parte del usuario, etc.) son propagados
+   *    por el proveedor Web3 y deben manejarse por el llamador o mediante listeners de errores.
+   *
+   * @param {string|number|BN} amount - Cantidad de tokens a stakear, expresada en la unidad mínima del token (p. ej. wei).
+   *                                    Acepta BN, string numérico o number según cómo se codifiquen las cantidades para Web3.
+   * @returns {void} Este método no devuelve una Promise; utiliza callbacks de Web3 (.send()) para seguir el progreso.
+   *
+   * @example
+   * // Stakear 100 tokens (suponiendo 18 decimales)
+   * // this.stakeTokens(web3.utils.toWei('100', 'ether'));
+   *
+   * @see tether.approve
+   * @see decentralBank.depositTokens
+   */
+  stakeTokens = (amount) => {
+    this.setState({ loading: true });
+    this.state.tether.methods
+      .approve(this.state.decentralBank._address, amount)
+      .send({ from: this.state.account })
+      .on("transactionHash", (hash) => {
+        this.state.decentralBank.methods
+          .depositTokens(amount)
+          .send({ from: this.state.account })
+          .on("transactionHash", (hash) => {
+            this.setState({ loading: false });
+          });
+      });
+  };
+
+  /**
+   * Inicia una operación on-chain para deshacer el stake llamando al contrato DeFi conectado.
+   *
+   * - Establece this.state.loading = true antes de enviar la transacción.
+   * - Llama a this.state.decentralBank.methods.unstakeTokens().send({ from: this.state.account }) para enviar la tx.
+   * - Registra un listener para el evento "transactionHash" y restablece loading a false al recibir el hash.
+   *
+   * Nota: este método lanza una transacción asíncrona y no espera la confirmación final (receipt).
+   * Se recomienda añadir manejo de errores (evento "error") y/o procesar el "receipt" cuando sea necesario.
+   *
+   * @returns {void} No devuelve un valor directo; el ciclo de vida de la transacción se gestiona mediante callbacks de web3.
+   */
+  unstakeTokens = () => {
+    this.setState({ loading: true });
+    this.state.decentralBank.methods
+      .unstakeTokens()
+      .send({ from: this.state.account })
+      .on("transactionHash", (hash) => {
+        this.setState({ loading: false });
+      });
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -205,22 +268,5 @@ class App extends Component {
     );
   }
 }
-/*
-  stakeTokens = (amount) => {
-    this.setState({loading: true })
-    this.state.tether.methods.approve(this.state.decentralBank._address, amount).send({from: this.state.account}).on('transactionHash', (hash) => {
-      this.state.decentralBank.methods.depositTokens(amount).send({from: this.state.account}).on('transactionHash', (hash) => {
-        this.setState({loading:false})
-      })
-    }) 
-  }
-
-  unstakeTokens = () => {
-    this.setState({loading: true })
-    this.state.decentralBank.methods.unstakeTokens().send({from: this.state.account}).on('transactionHash', (hash) => {
-      this.setState({loading:false})
-    }) 
-  }
- */
 
 export default App;
